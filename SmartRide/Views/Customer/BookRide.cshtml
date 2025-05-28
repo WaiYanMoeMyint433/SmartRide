@@ -222,10 +222,10 @@
         margin-bottom: 4px;
     }
 
-    .vehicle-price {
-        font-size: 0.9rem;
-        color: #a64bf4;
-        font-weight: 500;
+    .vehicle-description {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        font-weight: 400;
     }
 
     .ride-summary {
@@ -469,15 +469,15 @@
             <div class="form-section">
                 <div class="section-title">Choose a vehicle</div>
                 <div class="vehicle-options">
-                    <div class="vehicle-option" data-vehicle="1" onclick="selectVehicle(1)">
+                    <div class="vehicle-option" data-vehicle="1" onclick="selectVehicle('1')">
                         <div class="vehicle-icon">🚗</div>
                         <div class="vehicle-name">Car</div>
-                        <div class="vehicle-price">80,000 VND</div>
+                        <div class="vehicle-description">Comfortable ride</div>
                     </div>
-                    <div class="vehicle-option" data-vehicle="2" onclick="selectVehicle(2)">
+                    <div class="vehicle-option" data-vehicle="2" onclick="selectVehicle('2')">
                         <div class="vehicle-icon">🏍️</div>
                         <div class="vehicle-name">Bike</div>
-                        <div class="vehicle-price">40,000 VND</div>
+                        <div class="vehicle-description">Quick & economical</div>
                     </div>
                 </div>
                 <select asp-for="VehicleType" id="VehicleType" style="display: none;">
@@ -495,8 +495,12 @@
                     <span class="summary-value" id="summaryVehicle">-</span>
                 </div>
                 <div class="summary-row">
+                    <span class="summary-label">Distance:</span>
+                    <span class="summary-value" id="summaryDistance">-</span>
+                </div>
+                <div class="summary-row">
                     <span class="summary-label">Estimate Time:</span>
-                    <span class="summary-value" id="summaryTime">15 minutes</span>
+                    <span class="summary-value" id="summaryTime">-</span>
                 </div>
                 <div class="summary-row">
                     <span class="summary-label">Price:</span>
@@ -550,20 +554,18 @@
 </div>
 
 <script>
-    // Location data
+    // Location distances (match your RideService._demoLocations)
     const locations = {
         'City Center': 0,
         'Airport': 15.5,
         'University': 8.2,
         'Shopping Mall': 5.7,
-        'Hospital': 12.3,
-        'Ton Duc Thang University': 8.5,
-        'Lotte Mall': 6.2
+        'Hospital': 12.3
     };
 
     let selectedPickup = '';
     let selectedDropoff = '';
-    let selectedVehicle = '';
+    let selectedVehicle = ''; // Initialize as empty string
     let selectedPayment = '1';
 
     function updateLocation(type) {
@@ -583,6 +585,9 @@
     }
 
     function selectVehicle(vehicleType) {
+        // Convert to string for consistent comparison
+        vehicleType = vehicleType.toString();
+
         // Update UI
         document.querySelectorAll('.vehicle-option').forEach(opt => opt.classList.remove('selected'));
         document.querySelector(`[data-vehicle="${vehicleType}"]`).classList.add('selected');
@@ -590,6 +595,8 @@
         // Update form
         document.getElementById('VehicleType').value = vehicleType;
         selectedVehicle = vehicleType;
+
+        console.log('Selected vehicle:', selectedVehicle); // Debug log
 
         updateSummary();
         calculateFare();
@@ -605,23 +612,53 @@
         selectedPayment = paymentType;
     }
 
-    function updateSummary() {
+        function updateSummary() {
         const summaryEl = document.getElementById('rideSummary');
         const bookBtn = document.getElementById('bookBtn');
 
+        console.log('UpdateSummary - Pickup:', selectedPickup, 'Dropoff:', selectedDropoff, 'Vehicle:', selectedVehicle); // Debug
+
         if (selectedPickup && selectedDropoff && selectedVehicle && selectedPickup !== selectedDropoff) {
-            const distance = Math.abs(locations[selectedPickup] - locations[selectedDropoff]);
-            const baseRate = selectedVehicle === '1' ? 2.5 : 1.8;
-            const fare = (distance * baseRate + 3.0).toFixed(2);
-            const vehicleName = selectedVehicle === '1' ? 'Car' : 'Bike';
-            const vndPrice = selectedVehicle === '1' ? '80,000 VND' : '40,000 VND';
+            // Use EXACT same logic as your RideService.CalculateFare method
+            const pickupDistance = locations[selectedPickup] || 0;
+            const dropoffDistance = locations[selectedDropoff] || 0;
+            const distance = Math.abs(pickupDistance - dropoffDistance);
+
+            // Match your backend rates exactly
+            let baseRate, vehicleName;
+            if (selectedVehicle === '1' || selectedVehicle === 1) {
+                baseRate = 2.5; // Car rate per km (matches VehicleType.Car ? 2.5m)
+                vehicleName = 'Car';
+            } else {
+                baseRate = 1.8; // Bike rate per km (matches : 1.8m)
+                vehicleName = 'Bike';
+            }
+
+            // Calculate fare using EXACT same formula as backend
+            const fareUSD = distance * baseRate + 3.0; // +3 base fare (matches + 3.0m)
+            const formattedUSD = '$' + fareUSD.toFixed(2);
+
+            // Calculate estimated time
+            const avgSpeed = vehicleName === 'Car' ? 35 : 25; // km/h
+            const estimatedMinutes = Math.max(Math.round((distance / avgSpeed) * 60), 5);
+
+            console.log('Fare calculation (matching backend):', {
+                distance: distance.toFixed(1) + ' km',
+                baseRate: baseRate,
+                baseFare: 3.0,
+                fareUSD: fareUSD.toFixed(2),
+                finalFare: formattedUSD,
+                vehicleName: vehicleName
+            }); // Debug
 
             document.getElementById('summaryVehicle').textContent = vehicleName;
-            document.getElementById('summaryPrice').textContent = vndPrice;
+            document.getElementById('summaryDistance').textContent = distance.toFixed(1) + ' km';
+            document.getElementById('summaryTime').textContent = estimatedMinutes + ' minutes';
+            document.getElementById('summaryPrice').textContent = formattedUSD;
 
             summaryEl.style.display = 'block';
             bookBtn.disabled = false;
-            bookBtn.textContent = 'Book Now';
+            bookBtn.textContent = `Book Now - ${formattedUSD}`;
         } else {
             summaryEl.style.display = 'none';
             bookBtn.disabled = true;

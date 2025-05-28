@@ -1,6 +1,8 @@
 ﻿@model SmartRide.Models.Ride
 @{
     ViewBag.Title = "Current Ride - Smart Ride";
+    ViewBag.UserName = Model?.Driver?.Name ?? "Driver";
+}
 }
 
 <style>

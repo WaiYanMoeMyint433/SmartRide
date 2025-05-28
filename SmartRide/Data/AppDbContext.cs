@@ -23,13 +23,13 @@ namespace SmartRide.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure User inheritance (Table Per Hierarchy) - KEEP THIS
+           
             modelBuilder.Entity<User>()
                 .HasDiscriminator<UserType>("UserType")
                 .HasValue<Customer>(UserType.Customer)
                 .HasValue<Driver>(UserType.Driver);
 
-            // User entity configuration - KEEP THIS
+           
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.UserId);
@@ -40,14 +40,14 @@ namespace SmartRide.Data
                 entity.HasIndex(e => e.Email).IsUnique();
             });
 
-            // Driver-specific configuration - KEEP THIS
+            // Driver-specific configuration 
             modelBuilder.Entity<Driver>(entity =>
             {
                 entity.Property(e => e.VehicleId).HasMaxLength(50);
                 entity.Property(e => e.LicenseNumber).HasMaxLength(50);
             });
 
-            // RideRequest entity configuration - FIXED
+            // RideRequest entity configuration 
             modelBuilder.Entity<RideRequest>(entity =>
             {
                 entity.HasKey(e => e.RequestId);
@@ -55,7 +55,6 @@ namespace SmartRide.Data
                 entity.Property(e => e.DropoffLocation).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.EstimatedFare).HasColumnType("decimal(10,2)");
 
-                // ✅ EXPLICIT configuration to control cascade behavior
                 entity.HasOne(e => e.Customer)
                     .WithMany()
                     .HasForeignKey(e => e.CustomerId)
@@ -68,7 +67,7 @@ namespace SmartRide.Data
                     .OnDelete(DeleteBehavior.NoAction);
             });
 
-            // Ride entity configuration - FIXED
+          
             modelBuilder.Entity<Ride>(entity =>
             {
                 entity.HasKey(e => e.RideId);
@@ -77,13 +76,11 @@ namespace SmartRide.Data
                 entity.Property(e => e.Distance).HasColumnType("decimal(8,2)");
                 entity.Property(e => e.Fare).HasColumnType("decimal(10,2)");
 
-                // ✅ Keep the RideRequest relationship
                 entity.HasOne(e => e.RideRequest)
                     .WithOne(r => r.Ride)
                     .HasForeignKey<Ride>(e => e.RequestId)
                     .OnDelete(DeleteBehavior.NoAction);
 
-                // ✅ EXPLICIT configuration to prevent cascade conflicts
                 entity.HasOne(e => e.Customer)
                     .WithMany()
                     .HasForeignKey(e => e.CustomerId)
@@ -95,26 +92,22 @@ namespace SmartRide.Data
                     .OnDelete(DeleteBehavior.NoAction);
             });
 
-            // Payment entity configuration - SIMPLIFIED
+         
             modelBuilder.Entity<Payment>(entity =>
             {
                 entity.HasKey(e => e.PaymentId);
                 entity.Property(e => e.Amount).HasColumnType("decimal(10,2)");
 
-                // ✅ Keep only the Ride relationship with NO ACTION
+            
                 entity.HasOne(e => e.Ride)
                     .WithOne(r => r.Payment)
                     .HasForeignKey<Payment>(e => e.RideId)
                     .OnDelete(DeleteBehavior.NoAction);
-
-                // ✅ If you have Customer relationship in Payment, configure it too
-                // entity.HasOne<Customer>()
-                //     .WithMany()
-                //     .HasForeignKey(e => e.CustomerId)
-                //     .OnDelete(DeleteBehavior.NoAction);
+  
+             
             });
 
-            // Report entity configuration - KEEP THIS
+        
             modelBuilder.Entity<Report>(entity =>
             {
                 entity.HasKey(e => e.ReportId);

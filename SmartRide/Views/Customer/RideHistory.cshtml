@@ -1,7 +1,12 @@
 ﻿@model List<SmartRide.Models.Ride>
 @{
     ViewBag.Title = "Your Ride History - Smart Ride";
+    ViewBag.PageTitle = "Ride History";
+    ViewBag.ShowBack = true; // Sub-page
+    ViewBag.UserName = ViewBag.CurrentUserName ?? "Customer";
 }
+
+@Html.Partial("_Header")
 
 <style>
     * {
@@ -23,6 +28,7 @@
         max-width: 500px;
         margin: 0 auto;
         background: white;
+        padding-top: 20px !important;
     }
 
     .header {
@@ -381,17 +387,6 @@
 </style>
 
 <div class="page-container">
-    <div class="header">
-        <a asp-action="Dashboard" class="back-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
-        </a>
-        <div class="header-content">
-            <div class="page-title">Your Ride History</div>
-            <div class="page-subtitle">View all your completed rides</div>
-        </div>
-    </div>
 
     <div class="main-content">
         @if (Model?.Any() == true)

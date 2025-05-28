@@ -12,8 +12,8 @@ using SmartRide.Data;
 namespace SmartRide.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250525140220_FixCascadeConflicts")]
-    partial class FixCascadeConflicts
+    [Migration("20250528114513_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

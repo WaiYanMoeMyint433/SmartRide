@@ -110,7 +110,7 @@ namespace SmartRide.Controllers
             }
         }
 
-        // POST: /Account/Logout
+        [HttpGet]
         [HttpPost]
         public IActionResult Logout()
         {
