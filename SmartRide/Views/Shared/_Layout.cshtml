@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartRide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+
+        body {
+            margin-bottom: 60px; /* Space for fixed footer */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="#">🚗 SmartRide</a>
+
+                @if (Context.Session.GetString("UserName") != null)
+                {
+                    <div class="navbar-nav ms-auto">
+                        <span class="navbar-text me-3 text-white">
+                            Welcome, @Context.Session.GetString("UserName")!
+                        </span>
+                        @if (Context.Session.GetString("UserType") == "Customer")
+                        {
+                            <a class="nav-link text-white" asp-controller="Customer" asp-action="Dashboard">Dashboard</a>
+                            <a class="nav-link text-white" asp-controller="Customer" asp-action="BookRide">Book Ride</a>
+                            <a class="nav-link text-white" asp-controller="Customer" asp-action="RideHistory">History</a>
+                        }
+                        else if (Context.Session.GetString("UserType") == "Driver")
+                        {
+                            <a class="nav-link text-white" asp-controller="Driver" asp-action="Dashboard">Dashboard</a>
+                            <a class="nav-link text-white" asp-controller="Driver" asp-action="RideHistory">History</a>
+                        }
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-link nav-link text-white" style="border: none; background: none;">Logout</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Info"] != null)
+            {
+                <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+                    @TempData["Info"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer text-muted">
+        <div class="container">
+            &copy; 2024 - SmartRide - Making transportation smarter
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

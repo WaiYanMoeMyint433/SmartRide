@@ -1,0 +1,684 @@
+﻿@model SmartRide.Models.Ride
+@{
+    ViewBag.Title = "Current Ride - Smart Ride";
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #f8f6ff 0%, #ffffff 100%);
+    }
+
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        background: white;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .back-btn {
+        background: #f5f5f5;
+        border: none;
+        border-radius: 12px;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        margin-right: 20px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: #374151;
+    }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+    .header-content {
+        flex: 1;
+    }
+
+    .page-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 2px;
+    }
+
+    .ride-id {
+        font-size: 0.9rem;
+        color: #9ca3af;
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 20px;
+    }
+
+    /* Status Header */
+    .status-header {
+        background: linear-gradient(135deg, #a64bf4, #c777f7);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 24px;
+        color: white;
+        text-align: center;
+    }
+
+    .status-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 1.5rem;
+    }
+
+    .status-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .status-subtitle {
+        font-size: 0.95rem;
+        opacity: 0.9;
+    }
+
+    /* Customer Info */
+    .customer-section {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(166, 75, 244, 0.1);
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .customer-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .customer-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #a64bf4, #c777f7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-right: 16px;
+    }
+
+    .customer-details h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 4px;
+    }
+
+    .customer-contact {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .contact-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .contact-label {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .contact-value {
+        font-size: 0.9rem;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .contact-phone {
+        color: #a64bf4 !important;
+        text-decoration: none;
+    }
+
+        .contact-phone:hover {
+            color: #8b5cf6 !important;
+        }
+
+    /* Route Section */
+    .route-section {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(166, 75, 244, 0.1);
+    }
+
+    .route-visual {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+    }
+
+    .route-line {
+        flex: 1;
+        height: 3px;
+        background: linear-gradient(90deg, #10b981, #a64bf4);
+        border-radius: 2px;
+        margin: 0 16px;
+        position: relative;
+    }
+
+    .route-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .pickup-dot {
+        background: #10b981;
+    }
+
+    .dropoff-dot {
+        background: #ef4444;
+    }
+
+    .route-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .route-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .route-label {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .route-value {
+        font-size: 0.9rem;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    /* Trip Stats */
+    .trip-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+    }
+
+    .stat-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #a64bf4;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    /* Time Info */
+    .time-info {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(166, 75, 244, 0.1);
+    }
+
+    .time-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .time-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .time-label {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .time-value {
+        font-size: 0.95rem;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        gap: 4px;
+        margin-top: 4px;
+    }
+
+    .status-assigned {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .status-progress {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    /* Action Section */
+    .action-section {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(166, 75, 244, 0.1);
+        text-align: center;
+    }
+
+    .action-instruction {
+        margin-bottom: 20px;
+    }
+
+    .instruction-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .instruction-location {
+        font-size: 1rem;
+        color: #a64bf4;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .instruction-subtitle {
+        font-size: 0.85rem;
+        color: #6b7280;
+        line-height: 1.4;
+    }
+
+    .btn-primary-action {
+        background: linear-gradient(135deg, #a64bf4, #c777f7);
+        color: white;
+        padding: 16px 32px;
+        border: none;
+        border-radius: 16px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 20px rgba(166, 75, 244, 0.25);
+        margin-bottom: 16px;
+        min-width: 200px;
+    }
+
+        .btn-primary-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(166, 75, 244, 0.35);
+        }
+
+    .btn-success-action {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 16px 32px;
+        border: none;
+        border-radius: 16px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25);
+        margin-bottom: 16px;
+        min-width: 200px;
+    }
+
+        .btn-success-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.35);
+        }
+
+    .btn-back {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 12px 24px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .btn-back:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+    /* Support Section */
+    .support-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 20px;
+    }
+
+    .support-text {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin: 0;
+    }
+
+    .support-number {
+        color: #a64bf4;
+        font-weight: 600;
+    }
+
+    /* Responsive */
+    @@media (max-width: 480px) {
+        .page-container {
+            margin: 0;
+        }
+
+        .header {
+            padding: 16px;
+        }
+
+        .main-content {
+            padding: 16px;
+        }
+
+        .customer-section, .route-section, .time-info, .action-section {
+            padding: 16px;
+        }
+
+        .trip-stats {
+            gap: 12px;
+        }
+
+        .customer-contact, .route-details, .time-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+    }
+
+    @@media (min-width: 768px) {
+        .page-container {
+            max-width: 600px;
+        }
+    }
+</style>
+
+<div class="page-container">
+    <div class="header">
+        <a asp-action="Dashboard" class="back-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+        </a>
+        <div class="header-content">
+            <div class="page-title">Current Ride</div>
+            <div class="ride-id">Ride #@Model.RideId</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Status Header -->
+        <div class="status-header">
+            <div class="status-icon">
+                @if (Model.Status == SmartRide.Models.RideStatus.Assigned)
+                {
+                    <span>📍</span>
+                }
+                else if (Model.Status == SmartRide.Models.RideStatus.InProgress)
+                {
+                    <span>🚗</span>
+                }
+            </div>
+            <div class="status-title">
+                @if (Model.Status == SmartRide.Models.RideStatus.Assigned)
+                {
+                    <span>Going to Pickup</span>
+                }
+                else if (Model.Status == SmartRide.Models.RideStatus.InProgress)
+                {
+                    <span>Ride in Progress</span>
+                }
+            </div>
+            <div class="status-subtitle">
+                @if (Model.Status == SmartRide.Models.RideStatus.Assigned)
+                {
+                    <span>Navigate to pickup location</span>
+                }
+                else if (Model.Status == SmartRide.Models.RideStatus.InProgress)
+                {
+                    <span>Heading to destination</span>
+                }
+            </div>
+        </div>
+
+        <!-- Customer Information -->
+        <div class="customer-section">
+            <div class="section-title">
+                👤 Customer Information
+            </div>
+            <div class="customer-info">
+                <div class="customer-avatar">
+                    @(Model.Customer.Name.Substring(0, 1).ToUpper())
+                </div>
+                <div class="customer-details">
+                    <h3>@Model.Customer.Name</h3>
+                </div>
+            </div>
+            <div class="customer-contact">
+                <div class="contact-item">
+                    <span class="contact-label">Phone</span>
+                    <a href="tel:@Model.Customer.Phone" class="contact-value contact-phone">@Model.Customer.Phone</a>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">Email</span>
+                    <span class="contact-value">@Model.Customer.Email</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trip Stats -->
+        <div class="trip-stats">
+            <div class="stat-card">
+                <div class="stat-value">@Model.Distance.ToString("F1") km</div>
+                <div class="stat-label">Distance</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">$@Model.Fare.ToString("F2")</div>
+                <div class="stat-label">Fare</div>
+            </div>
+        </div>
+
+        <!-- Route Information -->
+        <div class="route-section">
+            <div class="section-title">
+                📍 Route Details
+            </div>
+            <div class="route-visual">
+                <div class="route-dot pickup-dot"></div>
+                <div class="route-line"></div>
+                <div class="route-dot dropoff-dot"></div>
+            </div>
+            <div class="route-details">
+                <div class="route-item">
+                    <span class="route-label">Pickup Location</span>
+                    <span class="route-value">@Model.PickupLocation</span>
+                </div>
+                <div class="route-item">
+                    <span class="route-label">Drop-off Location</span>
+                    <span class="route-value">@Model.DropoffLocation</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Information -->
+        <div class="time-info">
+            <div class="section-title">
+                ⏰ Time Information
+            </div>
+            <div class="time-grid">
+                @if (Model.StartTime.HasValue)
+                {
+                    <div class="time-item">
+                        <span class="time-label">Started</span>
+                        <span class="time-value">@Model.StartTime.Value.ToString("HH:mm")</span>
+                    </div>
+                    @if (Model.Status == SmartRide.Models.RideStatus.InProgress)
+                    {
+                        <div class="time-item">
+                            <span class="time-label">Duration</span>
+                            <span class="time-value">@((DateTime.Now - Model.StartTime.Value).TotalMinutes.ToString("F0")) min</span>
+                        </div>
+                    }
+                }
+                <div class="time-item">
+                    <span class="time-label">Status</span>
+                    <div>
+                        @if (Model.Status == SmartRide.Models.RideStatus.Assigned)
+                        {
+                            <span class="status-badge status-assigned">🟡 Going to pickup</span>
+                        }
+                        else if (Model.Status == SmartRide.Models.RideStatus.InProgress)
+                        {
+                            <span class="status-badge status-progress">🟢 In progress</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Section -->
+        <div class="action-section">
+            @if (Model.Status == SmartRide.Models.RideStatus.Assigned)
+            {
+                <div class="action-instruction">
+                    <div class="instruction-title">📍 Navigate to Pickup Location</div>
+                    <div class="instruction-location">@Model.PickupLocation</div>
+                    <div class="instruction-subtitle">Once you arrive and the customer gets in, click "Start Ride"</div>
+                </div>
+                <form asp-action="StartRide" method="post" class="d-inline">
+                    <input type="hidden" name="rideId" value="@Model.RideId" />
+                    <button type="submit" class="btn-success-action" onclick="return confirm('Confirm that customer is in the vehicle?')">
+                        🚀 Start Ride
+                    </button>
+                </form>
+            }
+            else if (Model.Status == SmartRide.Models.RideStatus.InProgress)
+            {
+                <div class="action-instruction">
+                    <div class="instruction-title">🎯 Navigate to Destination</div>
+                    <div class="instruction-location">@Model.DropoffLocation</div>
+                    <div class="instruction-subtitle">Once you arrive at the destination, click "Complete Ride"</div>
+                </div>
+                <form asp-action="CompleteRide" method="post" class="d-inline">
+                    <input type="hidden" name="rideId" value="@Model.RideId" />
+                    <button type="submit" class="btn-primary-action" onclick="return confirm('Confirm that customer has reached destination?')">
+                        ✅ Complete Ride
+                    </button>
+                </form>
+            }
+
+            <div>
+                <a asp-action="Dashboard" class="btn-back">
+                    ← Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Support Section -->
+        <div class="support-section">
+            <p class="support-text">
+                <strong>Smart Ride Support:</strong> <span class="support-number">1-800-SMART-RIDE</span> | Emergency: <span class="support-number">911</span>
+            </p>
+        </div>
+    </div>
+</div>

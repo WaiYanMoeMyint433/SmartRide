@@ -1,0 +1,551 @@
+﻿@model CustomerDashboardViewModel
+@{
+    ViewBag.Title = "Customer Dashboard - Smart Ride";
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #f8f6ff 0%, #ffffff 100%);
+    }
+
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+    }
+
+    .header {
+        padding: 30px 20px 20px;
+        background: white;
+        text-align: center;
+    }
+
+    .welcome-section {
+        margin-bottom: 20px;
+    }
+
+    .welcome-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #a64bf4, #c777f7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+    }
+
+    .welcome-subtitle {
+        font-size: 1rem;
+        color: #9ca3af;
+        font-weight: 400;
+        font-style: italic;
+    }
+
+    .brand-logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #a64bf4, #c777f7);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: 0 8px 25px rgba(166, 75, 244, 0.2);
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 0 20px 20px;
+    }
+
+    /* Active Ride Section */
+    .ride-status {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(166, 75, 244, 0.1);
+    }
+
+    .status-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .status-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        font-size: 1.2rem;
+    }
+
+    .status-searching {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .status-active {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .status-info h5 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 4px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-top: 8px;
+    }
+
+    .badge-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .badge-accepted {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .ride-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .detail-label {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .detail-value {
+        font-size: 0.95rem;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .route-display {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .route-line {
+        flex: 1;
+        height: 2px;
+        background: linear-gradient(90deg, #10b981, #a64bf4);
+        border-radius: 1px;
+        margin: 0 12px;
+        position: relative;
+    }
+
+    .route-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .pickup-dot {
+        background: #10b981;
+    }
+
+    .dropoff-dot {
+        background: #ef4444;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 12px 16px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #a64bf4, #c777f7);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(166, 75, 244, 0.3);
+        }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #e5e7eb;
+    }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+    .btn-danger {
+        background: #fee;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+    }
+
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+
+    /* Main Action Section */
+    .action-section {
+        background: white;
+        border-radius: 20px;
+        padding: 30px 24px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(166, 75, 244, 0.1);
+    }
+
+    .hero-illustration {
+        width: 200px;
+        height: 150px;
+        border-radius: 16px;
+        margin: 0 auto 24px;
+        overflow: hidden;
+        border: 2px solid rgba(166, 75, 244, 0.1);
+        box-shadow: 0 4px 15px rgba(166, 75, 244, 0.1);
+    }
+
+        .hero-illustration img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .cta-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 12px;
+    }
+
+    .cta-subtitle {
+        font-size: 0.95rem;
+        color: #6b7280;
+        margin-bottom: 24px;
+        line-height: 1.5;
+    }
+
+    .main-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn-book {
+        background: linear-gradient(135deg, #a64bf4, #c777f7);
+        color: white;
+        padding: 16px;
+        border-radius: 16px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        box-shadow: 0 4px 20px rgba(166, 75, 244, 0.25);
+    }
+
+        .btn-book:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(166, 75, 244, 0.35);
+        }
+
+        .btn-book:disabled {
+            background: #d1d5db;
+            color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+    .btn-history {
+        background: white;
+        color: #a64bf4;
+        border: 2px solid #a64bf4;
+        padding: 14px;
+        border-radius: 16px;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+        .btn-history:hover {
+            background: #a64bf4;
+            color: white;
+        }
+
+    .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 0.8rem;
+        color: #a64bf4;
+        opacity: 0.7;
+    }
+
+    /* Quick Stats */
+    .quick-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .stat-item {
+        background: white;
+        border-radius: 12px;
+        padding: 16px 12px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #a64bf4;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    /* Responsive */
+    @@media (max-width: 480px) {
+        .page-container {
+            margin: 0;
+        }
+
+        .header {
+            padding: 20px 16px 16px;
+        }
+
+        .main-content {
+            padding: 0 16px 16px;
+        }
+
+        .ride-status, .action-section {
+            padding: 20px;
+        }
+
+        .hero-illustration {
+            width: 160px;
+            height: 120px;
+        }
+    }
+
+    @@media (min-width: 768px) {
+        .page-container {
+            max-width: 600px;
+        }
+    }
+</style>
+
+<div class="page-container">
+    <div class="header">
+        <div class="brand-logo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" />
+            </svg>
+        </div>
+        <div class="welcome-section">
+            <div class="welcome-title">Welcome, @(Model?.Customer?.Name ?? "Customer")! 👋</div>
+            <div class="welcome-subtitle">Your ride-sharing dashboard</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Active Ride/Request Section -->
+        @if (Model?.CurrentRequest != null)
+        {
+            <div class="ride-status" aria-live="polite">
+                <div class="status-header">
+                    <div class="status-icon status-searching">🔍</div>
+                    <div class="status-info">
+                        <h5>Current Ride Request</h5>
+                        <span class="status-badge badge-pending">@Model.CurrentRequest.Status</span>
+                    </div>
+                </div>
+
+                <div class="route-display">
+                    <div class="route-dot pickup-dot"></div>
+                    <div class="route-line"></div>
+                    <div class="route-dot dropoff-dot"></div>
+                </div>
+
+                <div class="ride-details">
+                    <div class="detail-item">
+                        <span class="detail-label">From</span>
+                        <span class="detail-value">@Model.CurrentRequest.PickupLocation</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">To</span>
+                        <span class="detail-value">@Model.CurrentRequest.DropoffLocation</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Vehicle</span>
+                        <span class="detail-value">@Model.CurrentRequest.VehicleType</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Fare</span>
+                        <span class="detail-value">$@Model.CurrentRequest.EstimatedFare.ToString("F2")</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    @if (Model.CurrentRequest.Status == SmartRide.Models.RequestStatus.Pending)
+                    {
+                        <form asp-controller="Customer" asp-action="CancelRide" method="post" style="flex: 1;">
+                            <input type="hidden" name="requestId" value="@Model.CurrentRequest.RequestId" />
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this ride?')">
+                                Cancel Request
+                            </button>
+                        </form>
+                    }
+                    else if (Model.CurrentRequest.Status == SmartRide.Models.RequestStatus.Accepted)
+                    {
+                        <a asp-action="TrackRide" asp-route-requestId="@Model.CurrentRequest.RequestId" class="btn btn-primary">
+                            📍 Track Ride
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+        else if (Model?.ActiveRide != null)
+        {
+            <div class="ride-status" aria-live="polite">
+                <div class="status-header">
+                    <div class="status-icon status-active">🚗</div>
+                    <div class="status-info">
+                        <h5>Active Ride</h5>
+                        <span class="status-badge badge-accepted">@Model.ActiveRide.Status</span>
+                    </div>
+                </div>
+
+                <div class="route-display">
+                    <div class="route-dot pickup-dot"></div>
+                    <div class="route-line"></div>
+                    <div class="route-dot dropoff-dot"></div>
+                </div>
+
+                <div class="ride-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Driver</span>
+                        <span class="detail-value">@(Model.ActiveRide.Driver?.Name ?? "Unknown")</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone</span>
+                        <span class="detail-value">@(Model.ActiveRide.Driver?.Phone ?? "N/A")</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Vehicle</span>
+                        <span class="detail-value">@(Model.ActiveRide.Driver?.VehicleType.ToString() ?? "N/A")</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Vehicle ID</span>
+                        <span class="detail-value">@(Model.ActiveRide.Driver?.VehicleId ?? "N/A")</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a asp-action="TrackRide" asp-route-requestId="@Model.ActiveRide.RequestId" class="btn btn-primary">
+                        📍 View Details
+                    </a>
+                </div>
+            </div>
+        }
+
+        <!-- Main Action Section -->
+        <div class="action-section">
+            <div class="hero-illustration">
+                <img src="/images/bookaride.jpg" alt="Book a ride illustration" />
+            </div>
+
+            @if (Model?.CurrentRequest == null && Model?.ActiveRide == null)
+            {
+                <div class="cta-title">Ready for your next ride?</div>
+                <div class="cta-subtitle">Book a comfortable and safe ride to your destination in just a few taps</div>
+            }
+            else
+            {
+                <div class="cta-title">Complete your current ride</div>
+                <div class="cta-subtitle">You have an active ride. Complete it before booking a new one.</div>
+            }
+
+            <div class="main-actions">
+                @if (Model?.CurrentRequest == null && Model?.ActiveRide == null)
+                {
+                    <a asp-action="BookRide" class="btn btn-book">
+                        🚗 Book Ride Now
+                    </a>
+                }
+                else
+                {
+                    <button class="btn btn-book" disabled>
+                        Complete current ride first
+                    </button>
+                }
+                <a asp-action="RideHistory" class="btn btn-history">
+                    📋 View Ride History
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">Developed by AW company</div>
+</div>

@@ -1,0 +1,576 @@
+﻿@model SmartRide.ViewModels.TrackRideViewModel
+@{
+    ViewData["Title"] = "Track Your Ride";
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #f8f6ff 0%, #ffffff 100%);
+    }
+
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        background: white;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .back-btn {
+        background: #f5f5f5;
+        border: none;
+        border-radius: 12px;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        margin-right: 20px;
+        transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+        background: #e5e5e5;
+    }
+
+    .brand-section {
+        display: flex;
+        align-items: center;
+        flex: 1;
+    }
+
+    .brand-icon {
+        width: 40px;
+        height: 40px;
+        background: #a64bf4;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+    }
+
+    .brand-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #a64bf4;
+    }
+
+    .status-message {
+        padding: 20px;
+        text-align: center;
+        background: white;
+    }
+
+    .status-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #10b981;
+        margin-bottom: 8px;
+    }
+
+    .status-subtitle {
+        font-size: 0.95rem;
+        color: #6b7280;
+    }
+
+    .status-searching {
+        color: #f59e0b;
+    }
+
+    .status-searching .status-title {
+        color: #f59e0b;
+    }
+
+    .map-container {
+        flex: 1;
+        background: #f8f9fa;
+        position: relative;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .map-placeholder {
+        text-align: center;
+        color: #6b7280;
+    }
+
+    .map-placeholder svg {
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .route-line {
+        position: absolute;
+        top: 40%;
+        left: 20%;
+        right: 20%;
+        height: 4px;
+        background: linear-gradient(90deg, #10b981, #a64bf4);
+        border-radius: 2px;
+        z-index: 2;
+    }
+
+    .route-markers {
+        position: absolute;
+        top: 30%;
+        left: 15%;
+        right: 15%;
+        height: 80px;
+        z-index: 3;
+    }
+
+    .marker {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .pickup-marker {
+        background: #10b981;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .dropoff-marker {
+        background: #ef4444;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .driver-info {
+        background: white;
+        padding: 24px;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .driver-connected {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .driver-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #a64bf4, #c777f7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .driver-details {
+        flex: 1;
+    }
+
+    .driver-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 4px;
+    }
+
+    .vehicle-info {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin-bottom: 4px;
+    }
+
+    .driver-rating {
+        display: flex;
+        align-items: center;
+    }
+
+    .stars {
+        color: #fbbf24;
+        margin-right: 4px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .info-item {
+        text-align: center;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: #a64bf4;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-size: 0.9rem;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #a64bf4, #c777f7);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(166, 75, 244, 0.3);
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .btn-secondary:hover {
+        background: #e5e7eb;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+    }
+
+    .searching-animation {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f4f6;
+        border-top: 4px solid #a64bf4;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 16px;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .ride-details {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .detail-row:last-child {
+        margin-bottom: 0;
+        padding-top: 8px;
+        border-top: 1px solid #e5e7eb;
+        font-weight: 600;
+    }
+
+    .detail-label {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .detail-value {
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .badge-pending {
+        background: #fef3cd;
+        color: #92400e;
+    }
+
+    .badge-assigned {
+        background: #ddd6fe;
+        color: #7c3aed;
+    }
+
+    .badge-progress {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .badge-completed {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    /* Responsive */
+    @@media (min-width: 768px) {
+        .page-container {
+            max-width: 600px;
+        }
+    }
+</style>
+
+<div class="page-container">
+    <div class="header">
+        <a href="@Url.Action("Dashboard", "Customer")" class="back-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+        </a>
+        <div class="brand-section">
+            <div class="brand-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+                </svg>
+            </div>
+            <div class="brand-title">Smart Ride</div>
+        </div>
+    </div>
+
+    @if (Model.DriverName == "Searching...")
+    {
+        <div class="status-message status-searching">
+            <div class="status-title">Wait a moment!</div>
+            <div class="status-subtitle">Connecting you with our drivers...</div>
+        </div>
+
+        <div class="map-container">
+            <div class="searching-animation">
+                <div class="spinner"></div>
+                <span style="color: #6b7280;">Finding nearby drivers...</span>
+            </div>
+        </div>
+
+        <div class="driver-info">
+            <div class="ride-details">
+                <div class="detail-row">
+                    <span class="detail-label">Ride ID</span>
+                    <span class="detail-value">#@Model.Ride.RideId</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">From</span>
+                    <span class="detail-value">@Model.Ride.PickupLocation</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">To</span>
+                    <span class="detail-value">@Model.Ride.DropoffLocation</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Estimated Fare</span>
+                    <span class="detail-value">$@Model.Ride.Fare</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <form asp-action="CancelRide" asp-controller="Customer" method="post" style="flex: 1;">
+                    <input type="hidden" name="requestId" value="@Model.Ride.RequestId" />
+                    <button type="submit" class="btn btn-danger" 
+                            onclick="return confirm('Are you sure you want to cancel this ride request?')">
+                        Cancel Booking
+                    </button>
+                </form>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="status-message">
+            <div class="status-title">You have connected to your driver!</div>
+        </div>
+
+        <div class="map-container">
+            <div class="map-placeholder">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <p>Live tracking map will be shown here</p>
+                <p style="font-size: 0.8rem; opacity: 0.7;">Route: @Model.Ride.PickupLocation → @Model.Ride.DropoffLocation</p>
+            </div>
+            
+            <!-- Route visualization -->
+            <div class="route-line"></div>
+            <div class="route-markers">
+                <div class="marker pickup-marker"></div>
+                <div class="marker dropoff-marker"></div>
+            </div>
+        </div>
+
+        <div class="driver-info">
+            <div class="driver-connected">
+                <div class="driver-avatar">
+                    @(Model.DriverName.Substring(0, 1).ToUpper())
+                </div>
+                <div class="driver-details">
+                    <div class="driver-name">@Model.DriverName</div>
+                    <div class="vehicle-info">@Model.VehicleInfo</div>
+                    <div class="driver-rating">
+                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">License:</div>
+                    <div class="info-value">123-456-778</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Vehicle Id:</div>
+                    <div class="info-value">523-32-910</div>
+                </div>
+            </div>
+
+            <div class="ride-details">
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="status-badge badge-@(Model.Ride.Status.ToString().ToLower())">
+                        @Model.CurrentStatus
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Distance</span>
+                    <span class="detail-value">@Model.Ride.Distance km</span>
+                </div>
+                @if (Model.EstimatedArrival != "N/A")
+                {
+                    <div class="detail-row">
+                        <span class="detail-label">ETA</span>
+                        <span class="detail-value">@Model.EstimatedArrival</span>
+                    </div>
+                }
+                <div class="detail-row">
+                    <span class="detail-label">Total Fare</span>
+                    <span class="detail-value">$@Model.Ride.Fare</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                @if (Model.DriverPhone != "N/A")
+                {
+                    <a href="tel:@Model.DriverPhone" class="btn btn-primary">
+                        📞 Call Driver
+                    </a>
+                }
+                
+                @if (Model.Ride.Status != SmartRide.Models.RideStatus.Completed && Model.Ride.Status != SmartRide.Models.RideStatus.InProgress)
+                {
+                    <form asp-action="CancelRide" asp-controller="Customer" method="post" style="flex: 1;">
+                        <input type="hidden" name="requestId" value="@Model.Ride.RequestId" />
+                        <button type="submit" class="btn btn-secondary"
+                                onclick="return confirm('Are you sure you want to cancel this ride?')">
+                            Cancel
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-secondary" onclick="location.reload()">
+                        🔄 Refresh
+                    </button>
+                }
+            </div>
+
+            @if (Model.Ride.Status == SmartRide.Models.RideStatus.Completed)
+            {
+                <div style="margin-top: 16px;">
+                    <a href="@Url.Action("Dashboard", "Customer")" class="btn btn-primary" style="width: 100%;">
+                        ⭐ Rate Your Ride
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<script>
+    // Auto-refresh for live updates
+    var refreshInterval = @(Model.DriverName == "Searching..." ? "10000" : "30000");
+
+    setTimeout(function() {
+        if (@(Model.Ride.Status != SmartRide.Models.RideStatus.Completed ? "true" : "false")) {
+            location.reload();
+        }
+    }, refreshInterval);
+
+    // Add some visual feedback for loading states
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('form button[type="submit"]');
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                if (this.form.checkValidity()) {
+                    this.style.opacity = '0.7';
+                    this.innerHTML = '⏳ Processing...';
+                }
+            });
+        });
+    });
+</script>
